@@ -8,13 +8,317 @@
   <meta name="description" content="Manutenção de urgência para freezers comerciais, expositores e adegas. Atendimento especializado B2B em Goiânia e Trindade.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Manrope', sans-serif; background-color: #060913; color: #ffffff; }
+    body { font-family: 'Manrope', sans-serif; background-color: #060913; color: #ffffff; cursor: none; }
     .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
     .hero-gradient { background: linear-gradient(180deg, rgba(6, 9, 19, 0.4) 0%, #060913 100%); }
+    
+    /* Custom Cursor */
+    .cursor-dot {
+      width: 8px;
+      height: 8px;
+      background: #facc15;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background 0.2s;
+      box-shadow: 0 0 20px #facc15, 0 0 40px #facc15;
+    }
+    .cursor-ring {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #facc15;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s, height 0.3s, border-color 0.3s, background 0.3s;
+      opacity: 0.6;
+    }
+    .cursor-dot.hover, .cursor-ring.hover {
+      width: 16px;
+      height: 16px;
+      background: #facc15;
+    }
+    .cursor-ring.hover {
+      width: 60px;
+      height: 60px;
+      border-color: #facc15;
+      background: rgba(250, 204, 21, 0.1);
+    }
+    .cursor-dot.click {
+      width: 4px;
+      height: 4px;
+    }
+    .cursor-ring.click {
+      width: 30px;
+      height: 30px;
+    }
+    .cursor-trail {
+      width: 6px;
+      height: 6px;
+      background: #facc15;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9997;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s, transform 0.1s;
+      box-shadow: 0 0 10px #facc15;
+    }
+    
+    @media (max-width: 1024px) {
+      body { cursor: auto; }
+      .cursor-dot, .cursor-ring, .cursor-trail { display: none; }
+    }
+    
+    /* Scroll Progress */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #3b82f6, #facc15);
+      z-index: 9999;
+      transform-origin: left;
+      transform: scaleX(0);
+      box-shadow: 0 0 20px #3b82f6, 0 0 40px #facc15;
+    }
+    
+    /* Reveal Animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-60px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-left.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(60px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-right.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-scale.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    /* Text Reveal */
+    .text-reveal {
+      overflow: hidden;
+    }
+    .text-reveal span {
+      display: inline-block;
+      transform: translateY(100%);
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .text-reveal.active span {
+      transform: translateY(0);
+    }
+    .text-reveal span:nth-child(1) { transition-delay: 0.1s; }
+    .text-reveal span:nth-child(2) { transition-delay: 0.15s; }
+    .text-reveal span:nth-child(3) { transition-delay: 0.2s; }
+    .text-reveal span:nth-child(4) { transition-delay: 0.25s; }
+    .text-reveal span:nth-child(5) { transition-delay: 0.3s; }
+    
+    /* Magnetic Button */
+    .magnetic {
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    /* Particle Canvas */
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    /* Floating orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: float 20s infinite ease-in-out;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -30px) scale(1.1); }
+      50% { transform: translate(-20px, 40px) scale(0.9); }
+      75% { transform: translate(40px, 20px) scale(1.05); }
+    }
+    
+    /* Shimmer text */
+    .shimmer {
+      background: linear-gradient(90deg, #fff, #facc15, #3b82f6, #fff);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 3s infinite linear;
+    }
+    @keyframes shimmer {
+      0% { background-position: -300% 0; }
+      100% { background-position: 300% 0; }
+    }
+    
+    /* Glow pulse */
+    .glow-pulse {
+      animation: glowPulse 3s infinite ease-in-out;
+    }
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(250, 204, 21, 0.2); }
+      50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.5), 0 0 80px rgba(250, 204, 21, 0.4); }
+    }
+    
+    /* Staggered children */
+    .stagger > * {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: staggerIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes staggerIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .stagger > *:nth-child(1) { animation-delay: 0.1s; }
+    .stagger > *:nth-child(2) { animation-delay: 0.15s; }
+    .stagger > *:nth-child(3) { animation-delay: 0.2s; }
+    .stagger > *:nth-child(4) { animation-delay: 0.25s; }
+    .stagger > *:nth-child(5) { animation-delay: 0.3s; }
+    .stagger > *:nth-child(6) { animation-delay: 0.35s; }
+    
+    /* Loading screen */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: #060913;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .loader-ring {
+      width: 60px;
+      height: 60px;
+      border: 3px solid transparent;
+      border-top-color: #facc15;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loader-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #6b7280;
+    }
+    #loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    
+    /* Parallax layers */
+    .parallax-layer {
+      will-change: transform;
+    }
+    
+    /* Enhanced glass */
+    .glass-premium {
+      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.03) inset,
+        0 20px 40px -20px rgba(0,0,0,0.5),
+        0 0 60px -20px rgba(59,130,246,0.1);
+    }
+    
+    /* Noise overlay */
+    .noise-overlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+    }
+    
+    /* Focus visible */
+    :focus-visible {
+      outline: 2px solid #facc15;
+      outline-offset: 4px;
+    }
+    
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .cursor-dot, .cursor-ring, .cursor-trail {
+        transition: none !important;
+      }
+    }
   </style>
 </head>
 <body class="antialiased selection:bg-yellow-400/30">
+  <!-- Loader -->
+  <div id="loader" role="status" aria-label="Carregando">
+    <div class="loader-ring"></div>
+    <span class="loader-text">Repair On</span>
+  </div>
+  
+  <!-- Particle Canvas -->
+  <canvas id="particle-canvas"></canvas>
+  
+  <!-- Custom Cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-trail" id="trail1"></div>
+  <div class="cursor-trail" id="trail2"></div>
+  <div class="cursor-trail" id="trail3"></div>
+  <div class="cursor-trail" id="trail4"></div>
+  <div class="cursor-trail" id="trail5"></div>
+  
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
 
   <!-- Header -->
   <header class="fixed w-full top-0 z-50 glass border-b border-white/10">
@@ -29,137 +333,236 @@
   </header>
 
   <!-- Hero Section -->
-  <section class="relative pt-40 pb-20 lg:pt-52 lg:pb-40 overflow-hidden min-h-screen flex items-center">
-    <div class="absolute inset-0 z-0">
+  <section class="relative pt-40 pb-20 lg:pt-52 lg:pb-40 overflow-hidden min-h-screen flex items-center noise-overlay">
+    <!-- Floating Orbs -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="orb w-[400px] h-[400px] bg-blue-600/20 top-1/4 left-1/4" style="animation-delay: 0s;"></div>
+      <div class="orb w-[300px] h-[300px] bg-yellow-500/15 top-3/4 right-1/4" style="animation-delay: -5s;"></div>
+      <div class="orb w-[200px] h-[200px] bg-blue-500/10 bottom-1/4 left-1/2" style="animation-delay: -10s;"></div>
+    </div>
+    
+    <div class="absolute inset-0 z-0 parallax-layer" data-parallax="0.3">
       <img src="img/imgi_58_banner-geladeira.webp" class="w-full h-full object-cover opacity-30" alt="Freezer Comercial">
       <div class="absolute inset-0 hero-gradient"></div>
     </div>
     
     <div class="container mx-auto px-6 relative z-10">
-      <div class="max-w-3xl">
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-gray-300 mb-8 border border-white/10">
+      <div class="max-w-3xl stagger">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-premium text-sm text-gray-300 mb-8 border border-white/10 reveal reveal-scale" style="transition-delay: 0.1s;">
           <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse"></span>
           Urgência B2B • Goiânia e Trindade
         </div>
-        <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6">
-          Não perca seu estoque. <br/>
+        <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 text-reveal">
+          <span>Não perca seu estoque.</span><br/>
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-yellow-400">
             Refrigeração Comercial de Alta Precisão.
           </span>
         </h1>
-        <p class="text-xl text-gray-400 mb-10 leading-relaxed max-w-2xl">
+        <p class="text-xl text-gray-400 mb-10 leading-relaxed max-w-2xl reveal reveal-left" style="transition-delay: 0.4s;">
           Manutenção especializada em freezers, expositores e adegas para supermercados e restaurantes. Diagnóstico rápido, laudo técnico e peças originais.
         </p>
-        <a href="https://wa.me/556299136549?text=Ol%C3%A1%2C%20estou%20com%20urg%C3%AAncia." class="inline-flex items-center gap-3 bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition-all hover:scale-105 shadow-[0_0_40px_rgba(250,204,21,0.4)]">
+        <a href="https://wa.me/556299136549?text=Ol%C3%A1%2C%20estou%20com%20urg%C3%AAncia." class="inline-flex items-center gap-3 bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition-all hover:scale-105 shadow-[0_0_40px_rgba(250,204,21,0.4)] magnetic reveal reveal-scale glow-pulse" style="transition-delay: 0.5s;" data-magnetic>
           Solicitar Técnico Agora
         </a>
+      </div>
+    </div>
+    
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500 reveal reveal-scale" style="transition-delay: 0.8s;">
+      <span class="text-xs uppercase tracking-widest font-medium">Role para descobrir</span>
+      <div class="w-1.5 h-10 bg-white/10 rounded-full relative overflow-hidden">
+        <div class="absolute inset-x-0 bottom-0 h-4 bg-yellow-400 rounded-full animate-bounce" style="animation-duration: 1.5s;"></div>
       </div>
     </div>
   </section>
 
   <!-- Brands Section -->
-  <section class="py-12 bg-white/5 border-t border-white/5">
-    <div class="container mx-auto px-6">
-      <p class="text-center text-gray-400 text-sm font-bold uppercase tracking-widest mb-8">Trabalhamos com as melhores marcas</p>
-      <div class="flex flex-wrap justify-center items-center gap-12 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
-        <img src="img/imgi_7_metalfrio-1024-1-e1787428867185-768x228.webp" class="h-10 w-auto" alt="Metalfrio">
-        <img src="img/imgi_4_Electrolux_2015-768x177.webp" class="h-8 w-auto" alt="Electrolux">
-        <img src="img/imgi_10_Samsung_Logo.svg-768x255.webp" class="h-8 w-auto" alt="Samsung">
-        <img src="img/imgi_9_Panasonic_logo_Blue.svg-768x123.webp" class="h-8 w-auto" alt="Panasonic">
-        <img src="img/imgi_6_NovaLogoConsul.webp" class="h-12 w-auto" alt="Consul">
-        <img src="img/imgi_8_Philco-logo.webp" class="h-8 w-auto" alt="Philco">
+  <section class="py-16 bg-white/5 border-t border-white/5 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-transparent to-yellow-500/5"></div>
+    <div class="container mx-auto px-6 relative">
+      <p class="text-center text-gray-400 text-sm font-bold uppercase tracking-widest mb-12 reveal reveal-scale">Trabalhamos com as melhores marcas</p>
+      <div class="flex flex-wrap justify-center items-center gap-10 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-700 stagger">
+        <img src="img/imgi_7_metalfrio-1024-1-e1787428867185-768x228.webp" class="h-12 w-auto reveal reveal-scale" style="transition-delay: 0.1s;" alt="Metalfrio">
+        <img src="img/imgi_4_Electrolux_2015-768x177.webp" class="h-10 w-auto reveal reveal-scale" style="transition-delay: 0.15s;" alt="Electrolux">
+        <img src="img/imgi_10_Samsung_Logo.svg-768x255.webp" class="h-10 w-auto reveal reveal-scale" style="transition-delay: 0.2s;" alt="Samsung">
+        <img src="img/imgi_9_Panasonic_logo_Blue.svg-768x123.webp" class="h-10 w-auto reveal reveal-scale" style="transition-delay: 0.25s;" alt="Panasonic">
+        <img src="img/imgi_6_NovaLogoConsul.webp" class="h-14 w-auto reveal reveal-scale" style="transition-delay: 0.3s;" alt="Consul">
+        <img src="img/imgi_8_Philco-logo.webp" class="h-10 w-auto reveal reveal-scale" style="transition-delay: 0.35s;" alt="Philco">
       </div>
     </div>
   </section>
 
   <!-- Diferenciais B2B -->
-  <section class="py-24 bg-[#0a0f1d] border-t border-white/5">
-    <div class="container mx-auto px-6">
+  <section class="py-24 lg:py-32 bg-[#0a0f1d] border-t border-white/5 relative overflow-hidden noise-overlay">
+    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 blur-[150px] rounded-full"></div>
+    <div class="container mx-auto px-6 relative">
       <div class="grid lg:grid-cols-2 gap-16 items-center">
-        <div>
-          <h2 class="text-4xl font-bold mb-6 leading-tight">Projetado para o ritmo do <span class="text-yellow-400">seu negócio.</span></h2>
-          <p class="text-gray-400 mb-10 text-lg">Nós entendemos que equipamento parado significa mercadoria perdida. Nosso foco é 100% no motor da sua empresa.</p>
+        <div class="reveal reveal-left">
+          <h2 class="text-4xl lg:text-5xl font-bold mb-6 leading-tight">Projetado para o ritmo do <span class="text-yellow-400 shimmer">seu negócio.</span></h2>
+          <p class="text-gray-400 mb-10 text-lg leading-relaxed">Nós entendemos que equipamento parado significa mercadoria perdida. Nosso foco é 100% no motor da sua empresa.</p>
           
-          <div class="space-y-8">
-            <div class="flex gap-5">
+          <div class="space-y-6 stagger">
+            <div class="flex gap-5 glass-premium p-4 rounded-2xl reveal reveal-scale" style="transition-delay: 0.1s;">
               <div class="shrink-0 w-14 h-14 rounded-2xl bg-blue-900/30 flex items-center justify-center text-blue-400 border border-blue-500/20">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               </div>
-              <div>
+              <div class="pt-1">
                 <h4 class="font-bold text-xl mb-1">SLA de Urgência</h4>
                 <p class="text-gray-400">Atendimento priorizado para parceiros comerciais no mesmo dia.</p>
               </div>
             </div>
-            <div class="flex gap-5">
+            <div class="flex gap-5 glass-premium p-4 rounded-2xl reveal reveal-scale" style="transition-delay: 0.15s;">
               <div class="shrink-0 w-14 h-14 rounded-2xl bg-blue-900/30 flex items-center justify-center text-blue-400 border border-blue-500/20">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
               </div>
-              <div>
+              <div class="pt-1">
                 <h4 class="font-bold text-xl mb-1">Laudo Técnico & NFe</h4>
                 <p class="text-gray-400">Documentação completa para prestação de contas da sua empresa.</p>
               </div>
             </div>
+            <div class="flex gap-5 glass-premium p-4 rounded-2xl reveal reveal-scale" style="transition-delay: 0.2s;">
+              <div class="shrink-0 w-14 h-14 rounded-2xl bg-yellow-900/30 flex items-center justify-center text-yellow-400 border border-yellow-500/20">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+              </div>
+              <div class="pt-1">
+                <h4 class="font-bold text-xl mb-1">Peças Originais</h4>
+                <p class="text-gray-400">Estoque próprio com componentes certificados pelos fabricantes.</p>
+              </div>
+            </div>
+            <div class="flex gap-5 glass-premium p-4 rounded-2xl reveal reveal-scale" style="transition-delay: 0.25s;">
+              <div class="shrink-0 w-14 h-14 rounded-2xl bg-green-900/30 flex items-center justify-center text-green-400 border border-green-500/20">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <div class="pt-1">
+                <h4 class="font-bold text-xl mb-1">Garantia Estendida</h4>
+                <p class="text-gray-400">Cobertura de 90 dias em todos os serviços realizados.</p>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="relative">
-          <div class="absolute inset-0 bg-yellow-400/10 blur-[100px] rounded-full"></div>
-          <img src="img/imgi_60_ChatGPT-Image-30-de-jul.-de-2025-13_21_58.webp" class="rounded-3xl border border-white/10 relative z-10 shadow-2xl object-cover h-[500px] w-full" alt="Técnico B2B">
+        <div class="relative reveal reveal-right">
+          <div class="absolute inset-0 bg-gradient-to-br from-yellow-400/20 via-transparent to-blue-600/20 blur-[100px] rounded-3xl"></div>
+          <div class="relative z-10">
+            <img src="img/imgi_60_ChatGPT-Image-30-de-jul.-de-2025-13_21_58.webp" class="rounded-3xl border border-white/10 shadow-2xl object-cover h-[500px] w-full parallax-layer" data-parallax="0.15" alt="Técnico B2B">
+            <!-- Floating badges -->
+            <div class="absolute -bottom-6 -left-6 glass-premium px-6 py-4 rounded-2xl animate-float-slow">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div>
+                  <p class="font-bold text-lg">Atendimento</p>
+                  <p class="text-sm text-gray-400">Em até 4h</p>
+                </div>
+              </div>
+            </div>
+            <div class="absolute -top-4 -right-4 glass-premium px-6 py-4 rounded-2xl animate-float-slow" style="animation-delay: -3s;">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-400/20 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                  <p class="font-bold text-lg">98%</p>
+                  <p class="text-sm text-gray-400">Resolução 1ª visita</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Equipamentos Atendidos -->
-  <section class="py-24">
-    <div class="container mx-auto px-6">
-      <div class="text-center mb-16 max-w-2xl mx-auto">
-        <h2 class="text-4xl font-bold mb-4">Especialistas em Linha Branca Comercial</h2>
+  <section class="py-24 lg:py-32 relative overflow-hidden noise-overlay">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-blue-600/5 to-transparent"></div>
+    <div class="container mx-auto px-6 relative">
+      <div class="text-center mb-16 max-w-2xl mx-auto reveal reveal-scale">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-4">Especialistas em Linha Branca Comercial</h2>
         <p class="text-gray-400 text-lg">Soluções definitivas para manter a temperatura e a qualidade dos seus produtos.</p>
       </div>
       
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="glass p-8 rounded-3xl hover:border-yellow-400/50 transition-colors group">
-          <div class="w-14 h-14 bg-yellow-400/10 rounded-2xl flex items-center justify-center text-yellow-400 mb-6 group-hover:bg-yellow-400 group-hover:text-gray-900 transition-colors">
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
+        <div class="glass-premium p-8 rounded-3xl hover:border-yellow-400/50 transition-all duration-500 group reveal reveal-scale relative overflow-hidden" style="transition-delay: 0.1s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-14 h-14 bg-yellow-400/10 rounded-2xl flex items-center justify-center text-yellow-400 mb-6 group-hover:bg-yellow-400 group-hover:text-gray-900 transition-all duration-500 group-hover:rotate-6 group-hover:scale-110">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
           </div>
-          <h3 class="text-2xl font-bold mb-3">Freezers Comerciais</h3>
-          <p class="text-gray-400">Manutenção corretiva e preventiva em freezers horizontais e verticais para estocagem.</p>
+          <h3 class="text-2xl font-bold mb-3 relative z-10">Freezers Comerciais</h3>
+          <p class="text-gray-400 relative z-10">Manutenção corretiva e preventiva em freezers horizontais e verticais para estocagem.</p>
+          <div class="absolute bottom-6 right-6 w-24 h-24 bg-yellow-400/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
-        <div class="glass p-8 rounded-3xl hover:border-yellow-400/50 transition-colors group">
-          <div class="w-14 h-14 bg-yellow-400/10 rounded-2xl flex items-center justify-center text-yellow-400 mb-6 group-hover:bg-yellow-400 group-hover:text-gray-900 transition-colors">
+        <div class="glass-premium p-8 rounded-3xl hover:border-blue-400/50 transition-all duration-500 group reveal reveal-scale relative overflow-hidden" style="transition-delay: 0.15s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-14 h-14 bg-blue-400/10 rounded-2xl flex items-center justify-center text-blue-400 mb-6 group-hover:bg-blue-400 group-hover:text-gray-900 transition-all duration-500 group-hover:-rotate-6 group-hover:scale-110">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
           </div>
-          <h3 class="text-2xl font-bold mb-3">Expositores</h3>
-          <p class="text-gray-400">Reparo de ilhas e balcões refrigerados de laticínios, garantindo o apelo visual e temperatura.</p>
+          <h3 class="text-2xl font-bold mb-3 relative z-10">Expositores</h3>
+          <p class="text-gray-400 relative z-10">Reparo de ilhas e balcões refrigerados de laticínios, garantindo o apelo visual e temperatura.</p>
+          <div class="absolute bottom-6 right-6 w-24 h-24 bg-blue-400/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
-        <div class="glass p-8 rounded-3xl hover:border-yellow-400/50 transition-colors group relative overflow-hidden">
-          <img src="img/imgi_43_1-768x768.webp" class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity" alt="Adega">
+        <div class="glass-premium p-8 rounded-3xl hover:border-green-400/50 transition-all duration-500 group reveal reveal-scale relative overflow-hidden" style="transition-delay: 0.2s;">
+          <img src="img/imgi_43_1-768x768.webp" class="absolute inset-0 w-full h-full object-cover opacity-15 group-hover:opacity-30 transition-opacity duration-500" alt="Adega">
           <div class="relative z-10">
-            <div class="w-14 h-14 bg-yellow-400/10 rounded-2xl flex items-center justify-center text-yellow-400 mb-6 group-hover:bg-yellow-400 group-hover:text-gray-900 transition-colors">
+            <div class="w-14 h-14 bg-green-400/10 rounded-2xl flex items-center justify-center text-green-400 mb-6 group-hover:bg-green-400 group-hover:text-gray-900 transition-all duration-500 group-hover:scale-110">
               <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
             </div>
             <h3 class="text-2xl font-bold mb-3">Adegas & Frigobares</h3>
             <p class="text-gray-300">Controle de temperatura de ultra-precisão para vinhos finos e hotelaria de luxo.</p>
           </div>
+          <div class="absolute bottom-6 right-6 w-24 h-24 bg-green-400/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
+        <div class="glass-premium p-8 rounded-3xl hover:border-purple-400/50 transition-all duration-500 group reveal reveal-scale relative overflow-hidden" style="transition-delay: 0.25s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-14 h-14 bg-purple-400/10 rounded-2xl flex items-center justify-center text-purple-400 mb-6 group-hover:bg-purple-400 group-hover:text-gray-900 transition-all duration-500 group-hover:rotate-6 group-hover:scale-110">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-3 relative z-10">Câmaras Frias</h3>
+          <p class="text-gray-400 relative z-10">Instalação e manutenção de câmaras de conservação e congelamento industrial.</p>
+          <div class="absolute bottom-6 right-6 w-24 h-24 bg-purple-400/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
+        <div class="glass-premium p-8 rounded-3xl hover:border-red-400/50 transition-all duration-500 group reveal reveal-scale relative overflow-hidden" style="transition-delay: 0.3s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-red-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-14 h-14 bg-red-400/10 rounded-2xl flex items-center justify-center text-red-400 mb-6 group-hover:bg-red-400 group-hover:text-gray-900 transition-all duration-500 group-hover:-rotate-6 group-hover:scale-110">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-3 relative z-10">Máquinas de Gelo</h3>
+          <p class="text-gray-400 relative z-10">Manutenção preventiva e corretiva em fabricadores de gelo em escama e cubos.</p>
+          <div class="absolute bottom-6 right-6 w-24 h-24 bg-red-400/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
+        <div class="glass-premium p-8 rounded-3xl hover:border-cyan-400/50 transition-all duration-500 group reveal reveal-scale relative overflow-hidden" style="transition-delay: 0.35s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-cyan-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-14 h-14 bg-cyan-400/10 rounded-2xl flex items-center justify-center text-cyan-400 mb-6 group-hover:bg-cyan-400 group-hover:text-gray-900 transition-all duration-500 group-hover:scale-110">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-3 relative z-10">Sistemas VRV/VRF</h3>
+          <p class="text-gray-400 relative z-10">Diagnóstico avançado e manutenção em sistemas de expansão direta de grande porte.</p>
+          <div class="absolute bottom-6 right-6 w-24 h-24 bg-cyan-400/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- CTA Footer -->
-  <footer class="border-t border-white/5 bg-[#060913] pt-24 pb-12 relative overflow-hidden">
+  <footer class="border-t border-white/5 bg-[#060913] pt-24 pb-12 relative overflow-hidden noise-overlay">
     <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-blue-600/20 blur-[120px] rounded-t-full pointer-events-none"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-yellow-500/10 blur-[120px] rounded-b-full pointer-events-none"></div>
     <div class="container mx-auto px-6 text-center relative z-10">
-      <h2 class="text-4xl lg:text-5xl font-bold mb-8">O motor da sua empresa <br/>não pode parar.</h2>
-      <a href="https://wa.me/556299136549?text=Ol%C3%A1%2C%20preciso%20agendar%20um%20reparo%20na%20minha%20empresa." class="inline-flex items-center gap-3 bg-yellow-400 text-gray-900 px-10 py-5 rounded-full font-bold text-xl hover:bg-yellow-300 transition-all hover:scale-105 shadow-[0_0_50px_rgba(250,204,21,0.3)] mb-20">
-        Agendar Visita Técnica
-      </a>
-      <div class="flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-8 text-gray-500 text-sm">
+      <div class="reveal reveal-scale">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-8 leading-tight">O motor da sua empresa <br/>não pode parar.</h2>
+      </div>
+      <div class="reveal reveal-scale" style="transition-delay: 0.1s;">
+        <a href="https://wa.me/556299136549?text=Ol%C3%A1%2C%20preciso%20agendar%20um%20reparo%20na%20minha%20empresa." class="inline-flex items-center gap-3 bg-yellow-400 text-gray-900 px-10 py-5 rounded-full font-bold text-xl hover:bg-yellow-300 transition-all hover:scale-105 shadow-[0_0_50px_rgba(250,204,21,0.3)] magnetic glow-pulse" data-magnetic>
+          Agendar Visita Técnica
+        </a>
+      </div>
+      <div class="flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-8 text-gray-500 text-sm mt-16 reveal reveal-left">
         <p>&copy; 2026 Repair On Refrigeração. Todos os direitos reservados.</p>
         <p class="mt-4 md:mt-0 flex items-center gap-2">Goiânia e Trindade - GO</p>
       </div>
     </div>
   </footer>
 
+<script src="js/app.js"></script>
 </body>
 </html>
