@@ -1,0 +1,7 @@
+[build]
+  command = "echo 'Static Site'"
+  publish = "."
+
+  
+  # By omitting this or not including it, we don't necessarily disable it if it's in the UI.
+  # Let's actually override the plugins completely if we can, or just set publish = "dist"
