@@ -1,6 +1,6 @@
 [build]
   command = "echo 'Static Site'"
-  publish = "."
+  publish = "out"
 
   
   # By omitting this or not including it, we don't necessarily disable it if it's in the UI.
